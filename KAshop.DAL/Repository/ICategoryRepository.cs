@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KAshop.DAL.DTO.Repository
+namespace KAshop.DAL.Repository
 {
    public interface ICategoryRepository
     {

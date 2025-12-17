@@ -1,6 +1,7 @@
+using KAshop.BLL.Service;
 using KAshop.DAL;
 using KAshop.DAL.Data;
-using KAshop.DAL.DTO.Repository;
+using KAshop.DAL.Repository;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -45,8 +46,9 @@ namespace KAshop.PL
             });
 
             builder.Services.AddSwaggerGen();
-
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+            builder.Services.AddScoped<BLL.Service.ICategoryService, CategoryService>();
             var app = builder.Build();
             app.UseRequestLocalization();
 
