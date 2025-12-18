@@ -1,16 +1,22 @@
 using KAshop.BLL.Service;
 using KAshop.DAL;
+using KAshop.DAL.Models;
 using KAshop.DAL.Data;
 using KAshop.DAL.Repository;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
+using KAshop.DAL.Utils;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 namespace KAshop.PL
 
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +26,10 @@ namespace KAshop.PL
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
             builder.Services.AddLocalization(options => options.ResourcesPath = "");
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+             
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             Test test = new Test();
 
@@ -49,7 +59,13 @@ namespace KAshop.PL
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             builder.Services.AddScoped<BLL.Service.ICategoryService, CategoryService>();
-            var app = builder.Build();
+            builder.Services.AddScoped<ISeedData, RoleSeedData>();
+            builder.Services.AddScoped<ISeedData, UserDataSeed>();
+            builder.Services.AddScoped<BLL.Service.IAuthenticationService,BLL.Service.AuthenticationService>();
+
+        
+
+         var app = builder.Build();
             app.UseRequestLocalization();
 
             // Configure the HTTP request pipeline.
@@ -58,6 +74,19 @@ namespace KAshop.PL
                 app.UseSwagger();
                 app.UseSwaggerUI();
                 app.MapOpenApi();
+            }
+
+            //it will deleate the objects created once the scope is out 
+            using (var scope = app.Services.CreateScope())
+            {
+                var Services = scope.ServiceProvider;
+                var seeders=Services.GetServices<ISeedData>();
+                foreach (var seeder in seeders)
+                {
+                    await seeder.DataSeed();
+                }
+
+
             }
 
             app.UseHttpsRedirection();
