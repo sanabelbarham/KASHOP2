@@ -3,27 +3,34 @@ using KAshop.DAL.DTO.Response;
 using KAshop.DAL.Models;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace KAshop.BLL.Service
 {
-   public class AuthenticationService : IAuthenticationService
+    public class AuthenticationService : IAuthenticationService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        public AuthenticationService(UserManager <ApplicationUser> userManager)
+        private readonly IConfiguration _configuration;
+
+        public AuthenticationService(UserManager<ApplicationUser> userManager,IConfiguration configuration)
         {
             _userManager = userManager;
+            _configuration = configuration;
         }
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
         {
             try
             {
                 var user = await _userManager.FindByEmailAsync(request.Email);
-                if(user is null)
+                if (user is null)
                 {
                     return new LoginResponse()
                     {
@@ -39,17 +46,18 @@ namespace KAshop.BLL.Service
                         Success = false,
                         Message = "invalid password"
                     };
-                  
+
                 }
                 return new LoginResponse()
                 {
                     Success = true,
-                    Message = "Login successfully"
+                    Message = "Login successfully",
+                    AccessToken= await GenerateAccessToken(user)
 
                 };
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new LoginResponse()
                 {
@@ -86,17 +94,43 @@ namespace KAshop.BLL.Service
                     Message = "success"
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new RegesterResponce()
                 {
                     Success = false,
                     Message = "an unexpected error",
-                    Errors = new List<string> { ex.Message}
+                    Errors = new List<string> { ex.Message }
 
                 };
             }
 
         }
-    }
+
+        private async Task<string> GenerateAccessToken(ApplicationUser user)
+        {
+            //what i want to store inside the token!! dont put the password in the token
+            var TokenClaims = new List<Claim>
+            {
+                 new Claim(ClaimTypes.NameIdentifier,user.Id),
+                new Claim(ClaimTypes.Name,user.UserName),
+                new Claim(ClaimTypes.Email,user.Email)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecreatKey"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: TokenClaims,
+                expires: DateTime.UtcNow.AddMinutes(30),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        }
+
+    
 }
