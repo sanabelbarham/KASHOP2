@@ -21,15 +21,17 @@ namespace KAshop.BLL.Service
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
         private readonly IEmailSender _emailSender;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
         public AuthenticationService(UserManager<ApplicationUser> userManager,IConfiguration configuration,
-             IEmailSender emailSender
+             IEmailSender emailSender,SignInManager<ApplicationUser>signInManager
 
             )
         {
             _userManager = userManager;
             _configuration = configuration;
             _emailSender = emailSender;
+            _signInManager = signInManager;
         }
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
         {
@@ -44,16 +46,43 @@ namespace KAshop.BLL.Service
                         Message = "Email not found",
                     };
                 }
-                var result = await _userManager.CheckPasswordAsync(user, request.Password);
-                if (!result)
+
+                if(await _userManager.IsLockedOutAsync(user))
                 {
                     return new LoginResponse()
                     {
                         Success = false,
-                        Message = "invalid password"
+                        Message = "account is loucked, try again later"
                     };
-
                 }
+
+                var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, true);
+                if (result.IsLockedOut)
+                {
+                    return new LoginResponse()
+                    {
+                        Success = false,
+                        Message = "account is loucked,due to multiple trys "
+                    };
+                }
+
+                else if (result.IsNotAllowed)
+                {
+                    return new LoginResponse()
+                    {
+                        Success = false,
+                        Message = "plz confirm email "
+                    };
+                }
+                else if (!result.Succeeded)
+                {
+                    return new LoginResponse()
+                    {
+                        Success = false,
+                        Message = "password not correct "
+                    };
+                }
+                 
                 return new LoginResponse()
                 {
                     Success = true,
@@ -92,14 +121,20 @@ namespace KAshop.BLL.Service
 
                     };
                 }
-
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                token = Uri.UnescapeDataString(token);
+                var emailUrl = $"https://localhost:7175/api/auth/Account/ConfirmEmail?token={token}&userid={user.Id}";
                 await _userManager.AddToRoleAsync(user, "User");
-                await _emailSender.SendEmailAsync(user.Email, "welcom", $"<h1>welcome....{user.UserName}");
+                await _emailSender.SendEmailAsync(user.Email, "welcom", $"<h1>welcome....{user.UserName} </h1> " +
+                    $"<a href={emailUrl} >confirm email</a>");
                 return new RegesterResponce()
                 {
                     Success = true,
                     Message = "success"
                 };
+
+
+
             }
             catch (Exception ex)
             {
@@ -112,11 +147,19 @@ namespace KAshop.BLL.Service
                 };
             }
 
+
+
         }
 
-
-
-
+        public async Task<bool> ConfirmEmailAsync(string token, string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null) return false;
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (!result.Succeeded) return false;
+            else
+                return true;
+        }
 
 
         private async Task<string> GenerateAccessToken(ApplicationUser user)
@@ -142,7 +185,40 @@ namespace KAshop.BLL.Service
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        public async Task<ForgetPasswordResponce> RequestPasswordReset(ForgetPasswordRequest request)
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if(user is null)
+            {
+                return new ForgetPasswordResponce()
+                {
+                    Success = false,
+                    Message = "Email not found"
+                };
+            }
+
+            var random = new Random();
+            var code = random.Next(1000, 9999).ToString();
+
+            user.CodeResetPassword = code;
+            user.PasswordResetCodeExpiry = DateTime.UtcNow.AddMinutes(15);
+
+            await _userManager.UpdateAsync(user);
+
+            await _emailSender.SendEmailAsync(
+                request.Email,
+                "reset password",
+                $"<p>code is {code}</p>"
+            );
+            return new ForgetPasswordResponce
+            {
+                Success = true,
+                Message="code sent to your email"
+            };
+
         }
+
+    }
 
     
 }

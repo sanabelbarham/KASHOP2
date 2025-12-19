@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using KAshop.BLL.Service;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity.Data;
 
 
 namespace KAshop.PL.Area.Identity
@@ -19,7 +21,7 @@ namespace KAshop.PL.Area.Identity
 
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequest request)
+        public async Task<IActionResult> Login(DAL.DTO.Request.LoginRequest request)
         {
             var result = await _authenticationService.LoginAsync(request);
             if (!result.Success)
@@ -30,7 +32,7 @@ namespace KAshop.PL.Area.Identity
         }
 
         [HttpPost("Register")]
-        public async Task <IActionResult> Register(RegisterRequest request)
+        public async Task <IActionResult> Register(DAL.DTO.Request.RegisterRequest request)
         {
             var result = await _authenticationService.RegisterAsync(request);
             if (!result.Success)
@@ -39,5 +41,28 @@ namespace KAshop.PL.Area.Identity
             }
             return Ok(result);
         }
+
+        [HttpGet("ConfirmEmail")]
+        public async Task <IActionResult> ConfirmEmail(string token,string userId )
+        {
+            var result = await _authenticationService.ConfirmEmailAsync(token,userId);
+
+          
+            return Ok(result);
+        }
+
+        [HttpPost("SendCode")]
+        public async Task<IActionResult> RequestPasswordReset(ForgetPasswordRequest request)
+        {
+            var result = await _authenticationService.RequestPasswordReset(request);
+
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
+
     }
 }

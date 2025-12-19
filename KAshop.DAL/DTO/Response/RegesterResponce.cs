@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace KAshop.DAL.DTO.Response
 {
-    public class RegesterResponce 
+    public class RegesterResponce : BaseResponce
     {
-        public bool Success { get; set; }
-        public string Message { get; set; }
-        public List<string>? Errors { get; set; }
+     
     }
 }

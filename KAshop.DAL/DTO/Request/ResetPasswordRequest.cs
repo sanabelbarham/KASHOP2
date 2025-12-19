@@ -4,13 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KAshop.DAL.DTO.Response
+namespace KAshop.DAL.DTO.Request
 {
-    public class LoginResponse: BaseResponce
+    class ResetPasswordRequest
     {
-
-     
-        public string?AccessToken { get; set; }
-
     }
 }
