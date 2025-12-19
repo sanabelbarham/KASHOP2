@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Identity.UI.Services;
 namespace KAshop.PL
 
 {
@@ -124,11 +125,13 @@ namespace KAshop.PL
             builder.Services.AddScoped<BLL.Service.ICategoryService, CategoryService>();
             builder.Services.AddScoped<ISeedData, RoleSeedData>();
             builder.Services.AddScoped<ISeedData, UserDataSeed>();
+
             builder.Services.AddScoped<BLL.Service.IAuthenticationService,BLL.Service.AuthenticationService>();
+            builder.Services.AddScoped<IEmailSender, EmailSender>();
 
-        
 
-         var app = builder.Build();
+
+            var app = builder.Build();
             app.UseRequestLocalization();
 
             // Configure the HTTP request pipeline.

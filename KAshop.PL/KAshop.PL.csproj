@@ -20,10 +20,5 @@
     <ProjectReference Include="..\KAshop.BLL\KAshop.BLL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Area\Admin\" />
-    <Folder Include="Area\User\" />
-  </ItemGroup>
-
  
 </Project>

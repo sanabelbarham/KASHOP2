@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace KAshop.PL.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/controller/[controller]")]
     [ApiController]
     [Authorize]
     public class CategoriesController : ControllerBase
