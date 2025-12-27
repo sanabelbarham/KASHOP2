@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System.Security.Claims;
 
 namespace KAshop.PL.Area.Admin
 {
@@ -26,6 +27,9 @@ namespace KAshop.PL.Area.Admin
         [HttpPost("")]
         public IActionResult Create(CategoryRequest request)
         {
+
+            var CreatedBy = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        
             var response = _categories.CreateCategory(request);
             return Ok(new { message = _localizer["success"].Value });
         }

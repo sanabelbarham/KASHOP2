@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using KAshop.BLL.Service;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity.Data;
+using KAshop.DAL.DTO.Response;
 
 
 namespace KAshop.PL.Area.Identity
@@ -55,6 +56,20 @@ namespace KAshop.PL.Area.Identity
         public async Task<IActionResult> RequestPasswordReset(ForgetPasswordRequest request)
         {
             var result = await _authenticationService.RequestPasswordReset(request);
+
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
+
+
+        [HttpPatch("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(DAL.DTO.Request.ResetPasswordRequest request)
+        {
+            var result = await _authenticationService.ResetPassword(request);
 
             if (!result.Success)
             {

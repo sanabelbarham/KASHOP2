@@ -129,15 +129,7 @@ namespace KAshop.PL
             });
 
             builder.Services.AddSwaggerGen();
-            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-
-            builder.Services.AddScoped<BLL.Service.ICategoryService, CategoryService>();
-            builder.Services.AddScoped<ISeedData, RoleSeedData>();
-            builder.Services.AddScoped<ISeedData, UserDataSeed>();
-
-            builder.Services.AddScoped<BLL.Service.IAuthenticationService,BLL.Service.AuthenticationService>();
-            builder.Services.AddScoped<IEmailSender, EmailSender>();
-
+         
 
 
             var app = builder.Build();

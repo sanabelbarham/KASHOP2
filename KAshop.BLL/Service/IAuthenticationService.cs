@@ -14,5 +14,6 @@ namespace KAshop.BLL.Service
         Task <LoginResponse> LoginAsync(LoginRequest request);
         Task<bool> ConfirmEmailAsync(string token, string userId);
         Task<ForgetPasswordResponce> RequestPasswordReset(ForgetPasswordRequest request);
+        Task<ResetPasswordResponce> ResetPassword(DAL.DTO.Request.ResetPasswordRequest request);
     }
 }

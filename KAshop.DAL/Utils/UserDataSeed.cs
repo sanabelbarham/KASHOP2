@@ -46,7 +46,7 @@ namespace KAshop.DAL.Utils
                 };
                 //the second part is the password
                 await _UserManager.CreateAsync(user1, "Pass@123");
-                await _UserManager.CreateAsync(user2, "Sbri@34g");
+                await _UserManager.CreateAsync(user2, "Admin@1234");
                 await _UserManager.CreateAsync(user3, "AS34$5dd");
 
 

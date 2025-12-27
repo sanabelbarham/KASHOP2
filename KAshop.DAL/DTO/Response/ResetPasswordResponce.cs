@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace KAshop.DAL.DTO.Response
 {
-    class ResetPasswordResponce
+  public  class ResetPasswordResponce:BaseResponce
     {
+
+        public string Email { get; set; }
     }
 }

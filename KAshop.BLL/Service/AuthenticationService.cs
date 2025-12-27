@@ -3,6 +3,7 @@ using KAshop.DAL.DTO.Response;
 using KAshop.DAL.Models;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -33,7 +34,7 @@ namespace KAshop.BLL.Service
             _emailSender = emailSender;
             _signInManager = signInManager;
         }
-        public async Task<LoginResponse> LoginAsync(LoginRequest request)
+        public async Task<LoginResponse> LoginAsync(DAL.DTO.Request.LoginRequest request)
         {
             try
             {
@@ -55,7 +56,7 @@ namespace KAshop.BLL.Service
                         Message = "account is loucked, try again later"
                     };
                 }
-
+                //the true in the parametrs counts how many fail attempt in writing password
                 var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, true);
                 if (result.IsLockedOut)
                 {
@@ -104,7 +105,7 @@ namespace KAshop.BLL.Service
             }
         }
 
-        public async Task<RegesterResponce> RegisterAsync(RegisterRequest request)
+        public async Task<RegesterResponce> RegisterAsync(DAL.DTO.Request.RegisterRequest request)
         {
             try
             {
@@ -218,6 +219,64 @@ namespace KAshop.BLL.Service
 
         }
 
+
+        public async Task<ResetPasswordResponce> ResetPassword(DAL.DTO.Request.ResetPasswordRequest request)
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user is null)
+            {
+                return new ResetPasswordResponce()
+                {
+                    Success = false,
+                    Message = "Email not found"
+                };
+            }
+
+            else if (user.CodeResetPassword != request.Code)
+            {
+                return new ResetPasswordResponce()
+                {
+                    Success = false,
+                    Message = "invalid code"
+                };
+            }
+
+
+            else if (user.PasswordResetCodeExpiry <DateTime.UtcNow)
+            {
+                return new ResetPasswordResponce()
+                {
+                    Success = false,
+                    Message = " code expired"
+                };
+            }
+
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, request.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                return new ResetPasswordResponce()
+                {
+                    Success = false,
+                    Message = "password reset error",
+                    Errors=result.Errors.Select(e=>e.Description).ToList()
+                };
+            }
+
+            await _emailSender.SendEmailAsync(
+                request.Email,
+                "changed  password",
+                $"<p>your password is changed</p>"
+            );
+            return new ResetPasswordResponce
+            {
+                Success = true,
+                Message = "password reset successfully"
+            };
+
+        }
     }
 
     
