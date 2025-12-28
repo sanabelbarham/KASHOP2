@@ -38,5 +38,40 @@ namespace KAshop.BLL.Service
 
 
         }
+        public async Task<BaseResponce> DeleteCategoryAsync(int id)
+        {
+            try
+            {
+                var category = await _categoryRepository.FindByIdAsync(id);
+
+                if (category is null)
+                {
+                    return new BaseResponce
+                    {
+                        Success = false,
+                        Message = "Category Not Found"
+                    };
+                }
+
+                await _categoryRepository.DeleteAsync(category);
+
+                return new BaseResponce
+                {
+                    Success = true,
+                    Message = "Category Deleted Succesfully"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponce
+                {
+                    Success = false,
+                    Message = "Can't Delete Category",
+                    Errors = new List<string> { ex.Message }
+                };
+            }
+
+        }
+
     }
 }

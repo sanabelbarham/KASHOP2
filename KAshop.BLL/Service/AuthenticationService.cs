@@ -166,11 +166,14 @@ namespace KAshop.BLL.Service
         private async Task<string> GenerateAccessToken(ApplicationUser user)
         {
             //what i want to store inside the token!! dont put the password in the token
+            var roles = await _userManager.GetRolesAsync(user);
             var TokenClaims = new List<Claim>
+            
             {
                  new Claim(ClaimTypes.NameIdentifier,user.Id),
                 new Claim(ClaimTypes.Name,user.UserName),
-                new Claim(ClaimTypes.Email,user.Email)
+                new Claim(ClaimTypes.Email,user.Email),
+                new Claim(ClaimTypes.Role,string.Join(',',roles))
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecreatKey"]));
@@ -180,7 +183,7 @@ namespace KAshop.BLL.Service
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: TokenClaims,
-                expires: DateTime.UtcNow.AddMinutes(30),
+                expires: DateTime.UtcNow.AddDays(5),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

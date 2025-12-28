@@ -14,5 +14,9 @@ namespace KAshop.DAL.Repository
 
         public Category Create(Category request);
         public List<Category> GetAll();
+
+         Task DeleteAsync(Category category);
+        Task<Category?> FindByIdAsync(int id);
+
     }
 }
