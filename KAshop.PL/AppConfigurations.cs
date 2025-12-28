@@ -1,22 +1,24 @@
 ﻿using KAshop.BLL.Service;
 using KAshop.DAL.Repository;
 using KAshop.DAL.Utils;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace KAshop.PL
 {
-    public class AppConfigurations
+    public static class AppConfigurations
     {
 
-        public void Config()
+        public static void Config(IServiceCollection Services)
         {
-            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
-            builder.Services.AddScoped<BLL.Service.ICategoryService, CategoryService>();
-            builder.Services.AddScoped<ISeedData, RoleSeedData>();
-            builder.Services.AddScoped<ISeedData, UserDataSeed>();
+          Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
-            builder.Services.AddScoped<BLL.Service.IAuthenticationService, BLL.Service.AuthenticationService>();
-            builder.Services.AddScoped<IEmailSender, EmailSender>();
+           Services.AddScoped<BLL.Service.ICategoryService, CategoryService>();
+            Services.AddScoped<ISeedData, RoleSeedData>();
+            Services.AddScoped<ISeedData, UserDataSeed>();
+
+            Services.AddScoped<BLL.Service.IAuthenticationService, BLL.Service.AuthenticationService>();
+            Services.AddScoped<IEmailSender, EmailSender>();
 
         }
     }

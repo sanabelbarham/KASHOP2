@@ -129,8 +129,8 @@ namespace KAshop.PL
             });
 
             builder.Services.AddSwaggerGen();
-         
 
+            AppConfigurations.Config(builder.Services);
 
             var app = builder.Build();
             app.UseRequestLocalization();
