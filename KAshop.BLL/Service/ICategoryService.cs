@@ -13,9 +13,10 @@ namespace KAshop.BLL.Service
     public interface ICategoryService
     {
 
-        public CategoryResponse CreateCategory(CategoryRequest request);
-        public List<CategoryResponse> GetCategory();
+        Task<CategoryResponse> CreateCategory(CategoryRequest request);
+        Task<List<CategoryResponse>> GetCategory();
         Task<BaseResponce> DeleteCategoryAsync(int id);
+        Task<BaseResponce> UpdateCategoryAsync(int id, CategoryRequest request);
 
 
     }

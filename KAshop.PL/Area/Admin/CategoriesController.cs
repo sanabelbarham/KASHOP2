@@ -24,15 +24,32 @@ namespace KAshop.PL.Area.Admin
             _localizer = localizer;
         }
 
-        [HttpPost("")]
-        public IActionResult Create(CategoryRequest request)
+        [HttpPatch("")]
+        public async Task< IActionResult >Create([FromBody] CategoryRequest request)
         {
 
             var CreatedBy = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var response = _categories.CreateCategory(request);
+            var response = await _categorySerivce.CreateCategory(request);
             return Ok(new { message = _localizer["success"].Value });
         }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCategory([FromRoute] int id, [FromBody] CategoryRequest request)
+        {
+            var result = await _categorySerivce.UpdateCategoryAsync(id, request);
+            if (!result.Success)
+            {
+                if (result.Message.Contains("Not Found"))
+                {
+                    return NotFound(result);
+                }
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
+
+
 
         [HttpDelete("{id}")]
 
@@ -52,6 +69,7 @@ namespace KAshop.PL.Area.Admin
 
             return Ok(result);
         }
+
 
 
     }

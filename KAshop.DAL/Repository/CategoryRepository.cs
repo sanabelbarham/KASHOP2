@@ -19,16 +19,16 @@ namespace KAshop.DAL.Repository
             _context = context;
         }
       
-        public Category Create(Category request)
+        public Category CreateAsync(Category request)
         {
-            _context.Categories.Add(request);
-            _context.SaveChanges();
+            _context.Categories.AddAsync(request);
+            _context.SaveChangesAsync();
             return request;
         }
 
-        public List<Category> GetAll()
+        public async Task<List<Category>> GetAllAsync()
         {
-    return _context.Categories.Include(c => c.Translations).ToList();
+           return await  _context.Categories.Include(c => c.Translations).ToListAsync();
         }
 
         public async Task<Category?> FindByIdAsync(int id)
@@ -41,6 +41,13 @@ namespace KAshop.DAL.Repository
         {
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<Category?>  UpdateAsync(Category category)
+        {
+            _context.Categories.Update(category);
+            _context.SaveChangesAsync();
+            return category;
         }
 
 

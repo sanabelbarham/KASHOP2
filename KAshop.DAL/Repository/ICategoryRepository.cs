@@ -9,14 +9,15 @@ using System.Threading.Tasks;
 
 namespace KAshop.DAL.Repository
 {
-   public interface ICategoryRepository
+    public interface ICategoryRepository
     {
 
-        public Category Create(Category request);
-        public List<Category> GetAll();
-
-         Task DeleteAsync(Category category);
+        public Category CreateAsync(Category request);
+        Task<List<Category>> GetAllAsync();
+        Task DeleteAsync(Category category);
+        Task<Category?> UpdateAsync(Category category);
         Task<Category?> FindByIdAsync(int id);
 
     }
+
 }

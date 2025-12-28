@@ -12,27 +12,27 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace KAshop.BLL.Service
 {
-     public class CategoryService:ICategoryService
+    public class CategoryService : ICategoryService
     {
 
         private readonly ICategoryRepository _categoryRepository;
 
-        public CategoryService(ICategoryRepository categoryRepository )
+        public CategoryService(ICategoryRepository categoryRepository)
         {
             _categoryRepository = categoryRepository;
         }
 
-        public CategoryResponse CreateCategory(CategoryRequest request)
+        public async Task<CategoryResponse> CreateCategory(CategoryRequest request)
         {
             var category = request.Adapt<Category>();
-            _categoryRepository.Create(category);
+            _categoryRepository.CreateAsync(category);
             var changeToCategoryResponceFormate = category.Adapt<CategoryResponse>();
             return changeToCategoryResponceFormate;
         }
 
-        public List<CategoryResponse> GetCategory()
+        public async Task<List<CategoryResponse>> GetCategory()
         {
-            var category = _categoryRepository.GetAll();
+            var category = await _categoryRepository.GetAllAsync();
             var response = category.Adapt<List<CategoryResponse>>();
             return response;
 
@@ -72,6 +72,57 @@ namespace KAshop.BLL.Service
             }
 
         }
+        public async Task<BaseResponce> UpdateCategoryAsync(int id, CategoryRequest request)
+        {
+            try
+            {
+                var category = await _categoryRepository.FindByIdAsync(id);
+                if (category is null)
+                {
+                    return new BaseResponce
+                    {
+                        Success = false,
+                        Message = "Category Not Found"
+                    };
+                }
+                if (request.Translations != null)
+                {
+                    foreach (var tmslation in request.Translations)
+                    {
+                        var existing = category.Translations.FirstOrDefault(t => t.Language == tmslation.Language);
 
+                        if (existing is not null)
+                        {
+                            existing.Name = tmslation.Name;
+                        }
+                        else
+                        {
+                            return new BaseResponce
+                            {
+                                Success = true,
+                                Message = $" Language {tmslation.Language} not supported"
+                            };
+                        }
+                    }
+                }
+
+                await _categoryRepository.UpdateAsync(category);
+                return new BaseResponce
+                {
+                    Success = true,
+                    Message = "Category Updated Successfully"
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponce
+                {
+                    Success = false,
+                    Message = "CCan not update category ",
+                    Errors = new List<string> { ex.Message }
+                };
+            }
+        }
     }
 }
