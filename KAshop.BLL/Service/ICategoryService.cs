@@ -17,7 +17,8 @@ namespace KAshop.BLL.Service
         Task<List<CategoryResponse>> GetCategory();
         Task<BaseResponce> DeleteCategoryAsync(int id);
         Task<BaseResponce> UpdateCategoryAsync(int id, CategoryRequest request);
-
+        Task<BaseResponce> ToggleStatus(int id);
+      
 
     }
 }

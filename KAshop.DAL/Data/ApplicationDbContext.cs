@@ -22,11 +22,11 @@ namespace KAshop.DAL.Data
 
 
         ApplicationDbContext _context;
-        private readonly HttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<CategoryTranslation> categoryTranslations { get; set; }
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options,HttpContextAccessor httpContextAccessor) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options,IHttpContextAccessor httpContextAccessor) : base(options)
         {
             _httpContextAccessor = httpContextAccessor;
         }

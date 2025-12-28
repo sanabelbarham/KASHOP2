@@ -70,7 +70,20 @@ namespace KAshop.PL.Area.Admin
             return Ok(result);
         }
 
-
+        [HttpPatch("toggle-status/{id}")]
+        public async Task<IActionResult> ToggleStatus(int id)
+        {
+            var result = await _categorySerivce.ToggleStatus(id);
+            if (!result.Success)
+            {
+                if(result.Message.Contains("Not Found"))
+                {
+                    return NotFound(result);
+                }
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
 
     }
 }

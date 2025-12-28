@@ -72,7 +72,44 @@ namespace KAshop.BLL.Service
             }
 
         }
-        public async Task<BaseResponce> UpdateCategoryAsync(int id, CategoryRequest request)
+
+
+        
+        public async Task<BaseResponce> ToggleStatus(int id)
+        {
+            try
+            {
+                var category = await _categoryRepository.FindByIdAsync(id);
+                if (category is null)
+                {
+                    return new BaseResponce
+                    {
+                        Success = false,
+                        Message = "Category Not Found"
+                    };
+                }
+
+                category.Status = category.Status == Status.Active ? Status.InActive : Status.Active;
+                await _categoryRepository.UpdateAsync(category);
+                return new BaseResponce
+                {
+                    Success = true,
+                    Message = "Category Updated Successfully"
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponce
+                {
+                    Success = false,
+                    Message = "Cant delete category",
+                    Errors=new List<string> { ex.Message}
+                };
+
+            }
+        }
+public async Task<BaseResponce> UpdateCategoryAsync(int id, CategoryRequest request)
         {
             try
             {

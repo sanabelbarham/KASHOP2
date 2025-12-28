@@ -15,7 +15,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Identity.UI.Services;
+
 namespace KAshop.PL
+
 
 {
     public class Program
@@ -105,6 +107,7 @@ namespace KAshop.PL
 
 
             Test test = new Test();
+            builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
